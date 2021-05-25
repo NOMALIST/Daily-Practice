@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="departments">
+
+	<insert id="insertDepartment" parameterType="com.sample.hr.vo.Department">
+	insert into departments
+	(department_id, department_name, manager_id, location_id)
+	values
+	(departments_seq.nextval, #{name}, #{managerId}, #{locationId})
+	</insert>
+	
+	<update id="updateDepartment" parameterType="com.sample.hr.vo.Department">
+	update departments
+	set
+	department_name = #{name},
+	manager_id = #{manager_id},
+	location_id = #{location_id}
+	where department_id = #{department_id}
+	</update>
+	
+	<delete id="deleteDepartment" parameterType="int">
+	delete from departments
+	where department_id = #{value}
+	</delete>
+	
+	<select id="getAllDepartment" resultType="com.sample.hr.vo.Department">
+	select department_id as id,
+	       department_name as name,
+	       manager_id as managerId,
+	       location_id as locationId
+	from departments
+	</select>
+	
+	<select id="getDepartmentByNo" parameterType="int" resultType="com.sample.hr.vo.Department">
+	select department_id as id,
+	       department_name as name,
+	       manager_id as managerId,
+	       location_id as locationId
+	from departments
+	where department_id = #{value}
+	</select>
+	
+	<select id="getDepartmentDto" parameterType="int" resultType="com.sample.hr.dto.DepartmentDto">
+	select D.department_id as id,
+		   D.department_name as name,
+		   D.manager_id as managerId,
+		   M.first_name||' '||M.last_name as managerName,
+		   L.city as city,
+		   (select count(*)
+		    from employees E
+		    where E.department_id = #{value}) as empCount
+	from departments D, employees M, locations L
+	where D.manager_id = M.employee_id(+)
+	and D.location_id = L.location_id(+)
+	and D.department_id = #{value}
+	</select>
+	
+</mapper>
+
+
